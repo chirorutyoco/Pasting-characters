@@ -1,0 +1,28 @@
+name: release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 照合して zip を作る
+        run: |
+          mkdir dist
+          cd ext_v*/
+          v=$(grep -oP '"version":\s*"\K[^"]+' manifest.json)
+          [ "v$v" = "$GITHUB_REF_NAME" ] || { echo "タグ $GITHUB_REF_NAME と manifest の版 $v が違います"; exit 1; }
+          zip "../dist/ia-ccfolia-ext_${GITHUB_REF_NAME}.zip" manifest.json background.js cc_main.js charash_build.js charash_coc.js charash_content.js ia_content.js ia_main.js koma_build.js store.js icons/icon16.png icons/icon32.png icons/icon48.png icons/icon128.png
+          unzip -l "../dist/ia-ccfolia-ext_${GITHUB_REF_NAME}.zip"
+      - name: Release に添付
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/*.zip --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" dist/*.zip --title "$GITHUB_REF_NAME" --generate-notes
+          fi
