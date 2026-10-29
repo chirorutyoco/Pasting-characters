@@ -1,0 +1,69 @@
+{
+  "manifest_version": 3,
+  "name": "いあきゃら→ココフォリア",
+  "version": "4.20.0",
+  "description": "いあきゃら(6版・7版)とキャラッシュ(エモクロア・ガイアケア・10_st・CoC6版・CoC7版)対応。ツールバーのボタンでキャラクターを待機列に保存し、ココフォリアでまとめてアイコン付き(立ち絵も登録)のコマとして作る。お気に入りは右クリックから",
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "activeTab",
+    "scripting",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "https://image.iaproject.app/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "いあきゃら⇔ココフォリア",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://iachara.com/view/*",
+        "https://iachara.com/edit/*"
+      ],
+      "js": [
+        "ia_main.js"
+      ],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://iachara.com/view/*",
+        "https://iachara.com/edit/*"
+      ],
+      "js": [
+        "koma_build.js",
+        "store.js",
+        "ia_content.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://charash.jp/*"
+      ],
+      "js": [
+        "charash_build.js",
+        "charash_coc.js",
+        "store.js",
+        "charash_content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
